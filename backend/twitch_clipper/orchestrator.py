@@ -61,7 +61,7 @@ class TwitchClipperOrchestrator:
         # 4. Detector de Picos
         self.detector = PeakDetector(
             peak_multiplier=config.PEAK_MULTIPLIER,
-            min_messages=5,
+            min_messages=config.MIN_PEAK_MESSAGES,
             cooldown_seconds=config.COOLDOWN_SECONDS,
             on_peak_detected=self._on_peak_detected
         )
@@ -104,7 +104,7 @@ class TwitchClipperOrchestrator:
             print(f"[{hora}] ↳ [Pico em andamento] Janela: {count:3d} msgs | Duração: {peak_res['duration_seconds']}s | Buffer vídeo: {buf_dur:.0f}s", flush=True)
         else:
             bar = "█" * min(20, int(ratio * 3))
-            print(f"[{hora}] Chat 10s: {count:3d} msgs ({users:2d} users) | Média ref: {baseline:4.1f} (Ratio: {ratio:3.1f}x) | Buffer vídeo: {buf_dur:4.0f}s  {bar}", flush=True)
+            print(f"[{hora}] Chat 10s: {count:3d} msgs ({users:2d} users) | Mediana ref: {baseline:4.1f} (Ratio: {ratio:3.1f}x) | Buffer vídeo: {buf_dur:4.0f}s  {bar}", flush=True)
 
     def _on_peak_detected(self, peak_event: Dict[str, Any]):
         """Disparado quando um novo pico é detectado"""

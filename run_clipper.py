@@ -22,8 +22,9 @@ async def main():
 
     try:
         await orchestrator.start()
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, SystemExit):
         print("\n[Encerrando sistema a pedido do usuário...]")
+    finally:
         orchestrator.stop()
 
 if __name__ == "__main__":

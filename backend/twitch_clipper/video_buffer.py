@@ -106,11 +106,19 @@ class VideoBuffer:
         }
 
     def clear_all(self):
-        """Limpa todos os arquivos do buffer"""
-        for seg in self.segments:
+        """Limpa todos os arquivos do buffer e remove o diretório temporário"""
+        import shutil
+        self.segments.clear()
+        if self.buffer_dir.exists():
+            for item in self.buffer_dir.iterdir():
+                try:
+                    if item.is_file():
+                        item.unlink()
+                    elif item.is_dir():
+                        shutil.rmtree(item, ignore_errors=True)
+                except Exception:
+                    pass
             try:
-                if seg["path"].exists():
-                    seg["path"].unlink()
+                shutil.rmtree(self.buffer_dir, ignore_errors=True)
             except Exception:
                 pass
-        self.segments.clear()

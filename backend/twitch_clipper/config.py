@@ -15,6 +15,7 @@ TWITCH_CHANNEL = (os.getenv("TWITCH_CHANNEL") or os.getenv("CHANNEL") or "").str
 # Configurações de Análise e Cortes (Uso pessoal)
 WINDOW_SECONDS = int(os.getenv("WINDOW_SECONDS", "10"))
 PEAK_MULTIPLIER = float(os.getenv("PEAK_MULTIPLIER", "3.0"))
+MIN_PEAK_MESSAGES = int(os.getenv("MIN_PEAK_MESSAGES", "5"))
 COOLDOWN_SECONDS = int(os.getenv("COOLDOWN_SECONDS", "60"))
 CLIP_PRE_SECONDS = int(os.getenv("CLIP_PRE_SECONDS", "30"))
 CLIP_POST_SECONDS = int(os.getenv("CLIP_POST_SECONDS", "30"))

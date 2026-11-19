@@ -48,6 +48,11 @@ class StreamCaptureService:
         """Inicia a captura contínua e o gerenciador de buffer em threads dedicadas"""
         if self.is_running:
             return
+        
+        # Garante que o diretório do buffer esteja limpo antes de iniciar
+        self.buffer.clear_all()
+        self.buffer_dir.mkdir(parents=True, exist_ok=True)
+
         self.is_running = True
         logger.info(f"[StreamCaptureService] Iniciando serviço de captura contínua para '{self.channel_name}'...")
 
@@ -58,7 +63,7 @@ class StreamCaptureService:
         self._watcher_thread.start()
 
     def stop(self):
-        """Para a captura e fecha o processo do FFmpeg com segurança"""
+        """Para a captura, encerra o FFmpeg e limpa os arquivos temporários do buffer"""
         logger.info("[StreamCaptureService] Parando serviço de captura...")
         self.is_running = False
         if self._ffmpeg_process:
@@ -68,6 +73,11 @@ class StreamCaptureService:
                 self._ffmpeg_process.wait(timeout=3)
             except Exception:
                 pass
+        
+        # Aguarda Windows liberar os handles de arquivo e limpa todo o buffer
+        time.sleep(0.5)
+        self.buffer.clear_all()
+        logger.info("[StreamCaptureService] [✓] Diretório do buffer temporário limpo com sucesso.")
 
     def _capture_loop(self):
         """Loop contínuo de conexão ao Streamlink e alimentação do FFmpeg"""

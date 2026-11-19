@@ -51,23 +51,30 @@ class ChatActivityAnalyzer:
 
     def get_baseline_mean(self) -> float:
         """
-        Calcula a média de referência móvel.
-        Para evitar que picos anteriores distorçam a média, janelas marcadas
-        como 'is_peak' são desconsideradas ou atenuadas no cálculo.
+        Calcula a linha de base de referência móvel utilizando a MEDIANA.
+        A mediana é estatisticamente robusta contra 'outliers' (explosões pontuais de chat),
+        impedindo que conversas agitadas inflacionem a referência normal.
         """
         if not self.history:
             return 1.0
 
-        # Filtra apenas janelas normais (sem picos)
-        normal_counts = [w["count"] for w in self.history if not w.get("is_peak", False)]
+        # Filtra apenas janelas normais (sem picos marcados)
+        counts = [w["count"] for w in self.history if not w.get("is_peak", False)]
         
-        # Se todas forem picos ou histórico muito curto, usa a mediana geral
-        if not normal_counts:
-            all_counts = sorted([w["count"] for w in self.history])
-            median = all_counts[len(all_counts) // 2]
-            return max(1.0, float(median))
+        # Se todas forem picos ou histórico muito curto, considera todas
+        if not counts:
+            counts = [w["count"] for w in self.history]
 
-        return max(1.0, float(sum(normal_counts) / len(normal_counts)))
+        sorted_counts = sorted(counts)
+        n = len(sorted_counts)
+        if n == 0:
+            return 1.0
+        elif n % 2 == 1:
+            median = sorted_counts[n // 2]
+        else:
+            median = (sorted_counts[(n // 2) - 1] + sorted_counts[n // 2]) / 2.0
+
+        return max(1.0, float(median))
 
     def mark_last_window_as_peak(self):
         """Marca a última janela fechada como pico para não inflar a média móvel futura"""
